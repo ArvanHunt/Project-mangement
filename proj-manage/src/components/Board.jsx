@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { DragDropContext } from "react-beautiful-dnd";
-import Column from "./Column";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 const initialData = {
   tasks: {
@@ -32,20 +31,20 @@ const initialData = {
 const Board = () => {
   const [data, setData] = useState(initialData);
   const [newTaskContent, setNewTaskContent] = useState("");
-  const [showTaskInput, setShowTaskInput] = useState(null); // Track which column is adding a task
+  const [showTaskInput, setShowTaskInput] = useState(null);
   const [newProjectTitle, setNewProjectTitle] = useState("");
   const [showProjectInput, setShowProjectInput] = useState(false);
 
   const onDragEnd = (result) => {
     const { destination, source, draggableId } = result;
 
-    if (!destination) return;
+    if (!destination) return; // Dropped outside the board
 
     if (
       destination.droppableId === source.droppableId &&
       destination.index === source.index
     ) {
-      return;
+      return; // No movement
     }
 
     const startColumn = data.columns[source.droppableId];
@@ -156,21 +155,6 @@ const Board = () => {
     });
   };
 
-  const editTask = (taskId, newContent) => {
-    const updatedTask = {
-      ...data.tasks[taskId],
-      content: newContent,
-    };
-
-    setData({
-      ...data,
-      tasks: {
-        ...data.tasks,
-        [taskId]: updatedTask,
-      },
-    });
-  };
-
   return (
     <div className="flex justify-center mt-10">
       <DragDropContext onDragEnd={onDragEnd}>
@@ -192,40 +176,59 @@ const Board = () => {
                   Delete Project
                 </button>
               </div>
-              <div className="mb-4">
-                {tasks.map((task) => (
+              <Droppable droppableId={column.id} type="task">
+                {(provided) => (
                   <div
-                    key={task.id}
-                    className="p-2 mb-2 bg-gray-200 rounded shadow-sm"
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    className="mb-4"
                   >
-                    <div className="flex justify-between">
-                      <span>{task.content}</span>
-                      <div>
-                        <button
-                          onClick={() => {
-                            const newContent = prompt(
-                              "Edit Task:",
-                              task.content
-                            );
-                            if (newContent) {
-                              editTask(task.id, newContent);
-                            }
-                          }}
-                          className="bg-yellow-500 text-white py-1 px-2 rounded mx-1"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => deleteTask(task.id, column.id)}
-                          className="bg-red-500 text-white py-1 px-2 rounded"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
+                    {tasks.map((task, index) => (
+                      <Draggable
+                        key={task.id}
+                        draggableId={task.id}
+                        index={index}
+                      >
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className="p-2 mb-2 bg-gray-200 rounded shadow-sm"
+                          >
+                            <div className="flex justify-between">
+                              <span>{task.content}</span>
+                              <div>
+                                <button
+                                  onClick={() => {
+                                    const newContent = prompt(
+                                      "Edit Task:",
+                                      task.content
+                                    );
+                                    if (newContent) {
+                                      // Handle task editing here
+                                    }
+                                  }}
+                                  className="bg-yellow-500 text-white py-1 px-2 rounded mx-1"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => deleteTask(task.id, column.id)}
+                                  className="bg-red-500 text-white py-1 px-2 rounded"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
                   </div>
-                ))}
-              </div>
+                )}
+              </Droppable>
 
               {showTaskInput === column.id ? (
                 <div className="flex flex-col items-center">

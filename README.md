@@ -1,7 +1,3 @@
-Here is a sample `README.md` file for your **Project Management Tool**:
-
----
-
 # Project Management Tool
 
 A **Project Management Tool** built using React, Vite, and Tailwind CSS. This application provides a Trello-like interface to organize tasks into multiple columns with **drag-and-drop functionality** powered by `react-beautiful-dnd`. 

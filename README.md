@@ -83,6 +83,9 @@ Follow these steps to set up the project locally:
 
 ## Demo
 
+<img width="807" alt="project management tool" src="https://github.com/user-attachments/assets/09408cf5-4321-4518-8bcd-d6d53f266f61" />
+
+
 
 ---
 
